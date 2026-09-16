@@ -108,8 +108,8 @@ create index if not exists audit_logs_created_idx on public.audit_logs(created_a
 
 insert into public.site_settings (id, data)
 values ('site', '{
-  "fullName": "Yash",
-  "brandName": "YASH",
+  "fullName": "Yaswanth Sai Reddy K",
+  "brandName": "YK",
   "role": "Full-Stack & AI Engineer",
   "heroTitle": "I build software from idea to production.",
   "heroIntro": "Full-stack products, backend systems, AI-assisted developer tooling and applied machine learning — built with product judgement and production-minded engineering.",
