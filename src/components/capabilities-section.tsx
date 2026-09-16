@@ -101,7 +101,7 @@ const workflow = [
       "Understand",
 
     description:
-      "Clarify the problem, users and failure cases.",
+      "Clarify the problem, users, constraints and failure cases, using AI where it helps explore context faster.",
   },
 
   {
@@ -111,7 +111,7 @@ const workflow = [
       "Design",
 
     description:
-      "Choose boundaries, data flow and trade-offs.",
+      "Define boundaries, data flow and trade-offs before committing to an implementation.",
   },
 
   {
@@ -121,7 +121,7 @@ const workflow = [
       "Build",
 
     description:
-      "Implement the smallest reliable surface.",
+      "Implement the smallest reliable end-to-end surface, using AI selectively for debugging and iteration.",
   },
 
   {
@@ -131,7 +131,7 @@ const workflow = [
       "Verify",
 
     description:
-      "Test assumptions, behaviour and edge cases.",
+      "Test behaviour, security, assumptions and edge cases, with AI supporting review where useful.",
   },
 
   {
@@ -141,7 +141,7 @@ const workflow = [
       "Ship",
 
     description:
-      "Observe the result and improve from evidence.",
+      "Release, observe real usage and improve the product from evidence.",
   },
 ];
 
@@ -335,7 +335,9 @@ export function CapabilitiesSection() {
       <div
         className={`
           ${shell}
+
           py-20
+
           lg:py-24
         `}
       >
@@ -476,20 +478,24 @@ export function CapabilitiesSection() {
             border-y
             border-black/10
 
-            py-9
-
             dark:border-white/[0.09]
 
             lg:mt-14
           "
         >
+          {/* WORKFLOW INTRO */}
+
           <div
             className="
               grid
-              gap-10
+              items-end
+              gap-7
 
-              lg:grid-cols-[.32fr_1.68fr]
-              lg:gap-14
+              py-8
+
+              lg:grid-cols-[0.9fr_1.1fr]
+              lg:gap-16
+              lg:py-9
             "
           >
             <div>
@@ -500,13 +506,13 @@ export function CapabilitiesSection() {
               <h3
                 className="
                   mt-4
-                  max-w-[320px]
+                  max-w-[560px]
 
                   font-[var(--font-display)]
-                  text-[clamp(32px,3.2vw,46px)]
+                  text-[clamp(40px,4vw,60px)]
                   font-semibold
-                  leading-[0.96]
-                  tracking-[-0.055em]
+                  leading-[0.92]
+                  tracking-[-0.062em]
                 "
               >
                 Fast iteration.
@@ -518,85 +524,143 @@ export function CapabilitiesSection() {
 
             <div
               className="
-                grid
-                gap-7
+                max-w-[590px]
 
-                sm:grid-cols-2
-
-                lg:grid-cols-5
-                lg:gap-0
+                lg:justify-self-end
               "
             >
-              {workflow.map(
-                (
-                  step,
-                  index,
-                ) => (
-                  <div
-                    key={
-                      step.title
-                    }
-                    className={`
-                      ${
-                        index > 0
-                          ? "lg:border-l lg:border-black/10 lg:pl-5 dark:lg:border-white/[0.09]"
-                          : ""
-                      }
+              <p
+                className="
+                  text-[10.5px]
+                  leading-7
+                  text-black/40
 
-                      ${
-                        index <
-                        workflow.length -
-                          1
-                          ? "lg:pr-5"
-                          : ""
-                      }
-                    `}
-                  >
-                    <span
-                      className="
-                        font-[var(--font-mono)]
-                        text-[7px]
-                        text-[#d96d45]
-                      "
-                    >
-                      {step.number}
-                    </span>
-
-                    <strong
-                      className="
-                        mt-5
-                        block
-
-                        text-[11px]
-                        font-semibold
-                        text-black/76
-
-                        dark:text-white/76
-                      "
-                    >
-                      {step.title}
-                    </strong>
-
-                    <p
-                      className="
-                        mt-3
-                        max-w-[180px]
-
-                        text-[8.5px]
-                        leading-5
-                        text-black/38
-
-                        dark:text-white/38
-                      "
-                    >
-                      {
-                        step.description
-                      }
-                    </p>
-                  </div>
-                ),
-              )}
+                  dark:text-white/40
+                "
+              >
+                AI is part of the
+                workflow where it helps
+                with exploration,
+                debugging and review,
+                while engineering
+                decisions and final
+                validation stay grounded
+                in the product, code and
+                real behaviour.
+              </p>
             </div>
+          </div>
+
+          {/* WORKFLOW STEPS */}
+
+          <div
+            className="
+              grid
+
+              border-t
+              border-black/10
+
+              dark:border-white/[0.09]
+
+              sm:grid-cols-2
+
+              lg:grid-cols-5
+            "
+          >
+            {workflow.map(
+              (
+                step,
+                index,
+              ) => (
+                <article
+                  key={
+                    step.title
+                  }
+                  className={`
+                    flex
+                    flex-col
+
+                    py-6
+
+                    sm:px-6
+
+                    lg:px-6
+                    lg:py-7
+
+                    ${
+                      index === 0
+                        ? "sm:pl-0 lg:pl-0"
+                        : ""
+                    }
+
+                    ${
+                      index > 0
+                        ? "lg:border-l lg:border-black/10 dark:lg:border-white/[0.09]"
+                        : ""
+                    }
+
+                    ${
+                      index %
+                        2 ===
+                      1
+                        ? "sm:border-l sm:border-black/10 dark:sm:border-white/[0.09] lg:border-l"
+                        : ""
+                    }
+
+                    ${
+                      index >=
+                      2
+                        ? "max-lg:border-t max-lg:border-black/10 dark:max-lg:border-white/[0.09]"
+                        : ""
+                    }
+                  `}
+                >
+                  <span
+                    className="
+                      font-[var(--font-mono)]
+                      text-[7px]
+                      tracking-[0.08em]
+                      text-[#d96d45]
+                    "
+                  >
+                    {step.number}
+                  </span>
+
+                  <strong
+                    className="
+                      mt-6
+                      block
+
+                      text-[12px]
+                      font-semibold
+                      tracking-[-0.015em]
+                      text-black/80
+
+                      dark:text-white/80
+                    "
+                  >
+                    {step.title}
+                  </strong>
+
+                  <p
+                    className="
+                      mt-3
+                      max-w-[220px]
+
+                      text-[9px]
+                      leading-[1.8]
+                      text-black/40
+
+                      dark:text-white/40
+                    "
+                  >
+                    {
+                      step.description
+                    }
+                  </p>
+                </article>
+              ),
+            )}
           </div>
         </div>
       </div>

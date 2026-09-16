@@ -109,6 +109,12 @@ export async function updateMessageStatusAction(form: FormData) {
 
 export async function saveSettingsAction(form: FormData) {
   await requireAdmin();
+
+  const requestedContactMode = text(form, "contactMode", 20);
+  const contactMode = ["form", "direct", "closed"].includes(requestedContactMode)
+    ? requestedContactMode
+    : "form";
+
   const data = {
     fullName: text(form, "fullName", 160),
     brandName: text(form, "brandName", 40).toUpperCase(),
@@ -120,9 +126,22 @@ export async function saveSettingsAction(form: FormData) {
     linkedinUrl: text(form, "linkedinUrl", 1000),
     email: text(form, "email", 220),
     resumeUrl: text(form, "resumeUrl", 1000),
+    contactMode,
+    contactHeadline: text(form, "contactHeadline", 260) || "Have a role,\nproject or idea?",
+    contactFormNote: text(form, "contactFormNote", 1000),
+    contactDirectNote: text(form, "contactDirectNote", 1000),
+    contactClosedNote: text(form, "contactClosedNote", 1000),
   };
-  await dbUpdate("site_settings", "id=eq.site", { data, updated_at: new Date().toISOString() });
-  await writeAudit("SITE_SETTINGS_UPDATED", "site", "site");
+
+  await dbUpdate("site_settings", "id=eq.site", {
+    data,
+    updated_at: new Date().toISOString(),
+  });
+
+  await writeAudit("SITE_SETTINGS_UPDATED", "site", "site", {
+    contactMode,
+  });
+
   revalidatePath("/");
   revalidatePath("/admin/settings");
 }

@@ -1,3 +1,5 @@
+export type ContactMode = "form" | "direct" | "closed";
+
 export type SiteSettings = {
   fullName: string;
   brandName: string;
@@ -9,11 +11,21 @@ export type SiteSettings = {
   linkedinUrl: string;
   email: string;
   resumeUrl: string;
+  contactMode: ContactMode;
+  contactHeadline: string;
+  contactFormNote: string;
+  contactDirectNote: string;
+  contactClosedNote: string;
 };
 
-const fullName = (process.env.NEXT_PUBLIC_FULL_NAME || "Yaswanth Sai Reddy Kadhati").trim();
+const fullName = (
+  process.env.NEXT_PUBLIC_FULL_NAME ||
+  "Yaswanth Sai Reddy Kadhati"
+).trim();
+
 const brandName = (
-  process.env.NEXT_PUBLIC_BRAND_NAME || "YASH"
+  process.env.NEXT_PUBLIC_BRAND_NAME ||
+  "YASH"
 )
   .trim()
   .toUpperCase();
@@ -29,7 +41,18 @@ export const siteConfig: SiteSettings = {
   githubUrl:
     process.env.NEXT_PUBLIC_GITHUB_URL ||
     "https://github.com/YaswanthSai2003",
-  linkedinUrl: process.env.NEXT_PUBLIC_LINKEDIN_URL || "",
-  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "",
-  resumeUrl: process.env.NEXT_PUBLIC_RESUME_URL || "",
+  linkedinUrl:
+    process.env.NEXT_PUBLIC_LINKEDIN_URL || "",
+  email:
+    process.env.NEXT_PUBLIC_CONTACT_EMAIL || "",
+  resumeUrl:
+    process.env.NEXT_PUBLIC_RESUME_URL || "",
+  contactMode: "form",
+  contactHeadline: "Have a role,\nproject or idea?",
+  contactFormNote:
+    "Send a message here. If it's a good fit, I'll get back to you using the verified email you provide.",
+  contactDirectNote:
+    "For hiring, collaboration or project enquiries, email or LinkedIn is the fastest way to reach me.",
+  contactClosedNote:
+    "I'm not taking new enquiries at the moment, but you can still explore my work and follow along through my public profiles.",
 };
