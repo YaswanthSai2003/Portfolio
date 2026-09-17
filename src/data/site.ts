@@ -12,6 +12,8 @@ export type SiteSettings = {
   email: string;
   resumeUrl: string;
   contactMode: ContactMode;
+  contactRequireVerification: boolean;
+  contactNotifyByEmail: boolean;
   contactHeadline: string;
   contactFormNote: string;
   contactDirectNote: string;
@@ -48,9 +50,11 @@ export const siteConfig: SiteSettings = {
   resumeUrl:
     process.env.NEXT_PUBLIC_RESUME_URL || "",
   contactMode: "form",
+  contactRequireVerification: true,
+  contactNotifyByEmail: false,
   contactHeadline: "Have a role,\nproject or idea?",
   contactFormNote:
-    "Send a message here. If it's a good fit, I'll get back to you using the verified email you provide.",
+    "Send a message here. If it's a good fit, I'll get back to you using the email you provide.",
   contactDirectNote:
     "For hiring, collaboration or project enquiries, email or LinkedIn is the fastest way to reach me.",
   contactClosedNote:

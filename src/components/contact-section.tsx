@@ -35,7 +35,10 @@ function DirectContact({ settings }: { settings: SiteSettings }) {
               Email
             </span>
             <span className="text-[13px] font-bold">
-              Email me <span className="transition-transform group-hover:translate-x-0.5">↗</span>
+              Email me{" "}
+              <span className="transition-transform group-hover:translate-x-0.5">
+                ↗
+              </span>
             </span>
           </a>
         ) : null}
@@ -51,7 +54,10 @@ function DirectContact({ settings }: { settings: SiteSettings }) {
               LinkedIn
             </span>
             <span className="text-[13px] font-bold">
-              Connect on LinkedIn <span className="transition-transform group-hover:translate-x-0.5">↗</span>
+              Connect on LinkedIn{" "}
+              <span className="transition-transform group-hover:translate-x-0.5">
+                ↗
+              </span>
             </span>
           </a>
         ) : null}
@@ -70,24 +76,8 @@ function ClosedContact() {
   return (
     <div className="border-t border-black/30 py-8 dark:border-white/30">
       <div className="flex items-center gap-3">
-        <span
-          className="
-            size-2
-            rounded-full
-            bg-[#f05a3d]
-            shadow-[0_0_0_4px_rgba(240,90,61,0.10)]
-          "
-        />
-
-        <p
-          className="
-            font-[var(--font-mono)]
-            text-[9px]
-            uppercase
-            tracking-[0.15em]
-            text-[#f05a3d]
-          "
-        >
+        <span className="size-2 rounded-full bg-[#f05a3d] shadow-[0_0_0_4px_rgba(240,90,61,0.10)]" />
+        <p className="font-[var(--font-mono)] text-[9px] uppercase tracking-[0.15em] text-[#f05a3d]">
           CONTACT STATUS
         </p>
       </div>
@@ -149,7 +139,9 @@ export function ContactSection({ settings }: { settings: SiteSettings }) {
       </div>
 
       {mode === "form" ? (
-        <ContactForm />
+        <ContactForm
+          requireVerification={settings.contactRequireVerification}
+        />
       ) : mode === "direct" ? (
         <DirectContact settings={settings} />
       ) : (

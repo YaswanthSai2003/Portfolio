@@ -115,6 +115,12 @@ export async function saveSettingsAction(form: FormData) {
     ? requestedContactMode
     : "form";
 
+  const contactRequireVerification =
+    form.get("contactRequireVerification") === "on";
+
+  const contactNotifyByEmail =
+    form.get("contactNotifyByEmail") === "on";
+
   const data = {
     fullName: text(form, "fullName", 160),
     brandName: text(form, "brandName", 40).toUpperCase(),
@@ -127,7 +133,11 @@ export async function saveSettingsAction(form: FormData) {
     email: text(form, "email", 220),
     resumeUrl: text(form, "resumeUrl", 1000),
     contactMode,
-    contactHeadline: text(form, "contactHeadline", 260) || "Have a role,\nproject or idea?",
+    contactRequireVerification,
+    contactNotifyByEmail,
+    contactHeadline:
+      text(form, "contactHeadline", 260) ||
+      "Have a role,\nproject or idea?",
     contactFormNote: text(form, "contactFormNote", 1000),
     contactDirectNote: text(form, "contactDirectNote", 1000),
     contactClosedNote: text(form, "contactClosedNote", 1000),
@@ -140,6 +150,8 @@ export async function saveSettingsAction(form: FormData) {
 
   await writeAudit("SITE_SETTINGS_UPDATED", "site", "site", {
     contactMode,
+    contactRequireVerification,
+    contactNotifyByEmail,
   });
 
   revalidatePath("/");
