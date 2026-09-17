@@ -16,7 +16,7 @@ const experience = [
   {
     period: "NOV 2025 — PRESENT",
     role: "Software Engineer",
-    company: "Searce · formerly Cloudside Technologies",
+    company: "Searce",
     bullets: [
       "Build and maintain backend and full-stack product features across Python, Node.js and React.",
       "Work with API authentication, permissions, caching, validation, debugging and production-oriented testing.",
