@@ -46,8 +46,8 @@ function RepositoryAction({
           inline-flex
           items-center
           gap-2
-          text-black/42
-          dark:text-white/42
+          text-[#c9825b]
+          dark:text-[#d99a78]
         "
       >
         <span
@@ -55,8 +55,8 @@ function RepositoryAction({
           className="
             size-1.5
             rounded-full
-            bg-black/30
-            dark:bg-white/30
+            bg-[#c9825b]
+            dark:bg-[#d99a78]
           "
         />
 
