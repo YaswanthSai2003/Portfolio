@@ -107,55 +107,235 @@ export async function updateMessageStatusAction(form: FormData) {
   revalidatePath("/admin/inbox");
 }
 
-export async function saveSettingsAction(form: FormData) {
+export async function saveSettingsAction(
+  form: FormData,
+) {
   await requireAdmin();
 
-  const requestedContactMode = text(form, "contactMode", 20);
-  const contactMode = ["form", "direct", "closed"].includes(requestedContactMode)
-    ? requestedContactMode
-    : "form";
+  const requestedContactMode =
+    text(
+      form,
+      "contactMode",
+      20,
+    );
+
+  const contactMode =
+    [
+      "form",
+      "direct",
+      "closed",
+    ].includes(
+      requestedContactMode,
+    )
+      ? requestedContactMode
+      : "form";
 
   const contactRequireVerification =
-    form.get("contactRequireVerification") === "on";
+    form.get(
+      "contactRequireVerification",
+    ) === "on";
 
   const contactNotifyByEmail =
-    form.get("contactNotifyByEmail") === "on";
+    form.get(
+      "contactNotifyByEmail",
+    ) === "on";
+
+  /*
+   * Preserve any settings that
+   * may already exist in the JSON.
+   */
+  const existing =
+    await dbSelect<{
+      id: string;
+      data: Record<
+        string,
+        unknown
+      >;
+    }>(
+      "site_settings",
+      "select=id,data&id=eq.site&limit=1",
+    );
+
+  const currentData =
+    existing[0]?.data ??
+    {};
 
   const data = {
-    fullName: text(form, "fullName", 160),
-    brandName: text(form, "brandName", 40).toUpperCase(),
-    role: text(form, "role", 140),
-    heroTitle: text(form, "heroTitle", 220),
-    heroIntro: text(form, "heroIntro", 1200),
-    availability: text(form, "availability", 220),
-    githubUrl: text(form, "githubUrl", 1000),
-    linkedinUrl: text(form, "linkedinUrl", 1000),
-    email: text(form, "email", 220),
-    resumeUrl: text(form, "resumeUrl", 1000),
+    ...currentData,
+
+    fullName:
+      text(
+        form,
+        "fullName",
+        160,
+      ),
+
+    brandName:
+      text(
+        form,
+        "brandName",
+        40,
+      ).toUpperCase(),
+
+    role:
+      text(
+        form,
+        "role",
+        140,
+      ),
+
+    heroTitle:
+      text(
+        form,
+        "heroTitle",
+        220,
+      ),
+
+    heroIntro:
+      text(
+        form,
+        "heroIntro",
+        1200,
+      ),
+
+    availability:
+      text(
+        form,
+        "availability",
+        220,
+      ),
+
+    githubUrl:
+      text(
+        form,
+        "githubUrl",
+        1000,
+      ),
+
+    linkedinUrl:
+      text(
+        form,
+        "linkedinUrl",
+        1000,
+      ),
+
+    email:
+      text(
+        form,
+        "email",
+        220,
+      ),
+
+    resumeUrl:
+      text(
+        form,
+        "resumeUrl",
+        1000,
+      ),
+
     contactMode,
+
     contactRequireVerification,
+
     contactNotifyByEmail,
+
     contactHeadline:
-      text(form, "contactHeadline", 260) ||
+      text(
+        form,
+        "contactHeadline",
+        260,
+      ) ||
       "Have a role,\nproject or idea?",
-    contactFormNote: text(form, "contactFormNote", 1000),
-    contactDirectNote: text(form, "contactDirectNote", 1000),
-    contactClosedNote: text(form, "contactClosedNote", 1000),
+
+    contactFormNote:
+      text(
+        form,
+        "contactFormNote",
+        1000,
+      ),
+
+    contactDirectNote:
+      text(
+        form,
+        "contactDirectNote",
+        1000,
+      ),
+
+    contactClosedNote:
+      text(
+        form,
+        "contactClosedNote",
+        1000,
+      ),
   };
 
-  await dbUpdate("site_settings", "id=eq.site", {
+  const payload = {
     data,
-    updated_at: new Date().toISOString(),
-  });
+    updated_at:
+      new Date()
+        .toISOString(),
+  };
 
-  await writeAudit("SITE_SETTINGS_UPDATED", "site", "site", {
-    contactMode,
-    contactRequireVerification,
-    contactNotifyByEmail,
-  });
+  if (existing[0]) {
+    const updated =
+      await dbUpdate<{
+        id: string;
+      }>(
+        "site_settings",
+        "id=eq.site",
+        payload,
+      );
 
-  revalidatePath("/");
-  revalidatePath("/admin/settings");
+    /*
+     * This should normally never
+     * happen, but protects against
+     * a missing/deleted row.
+     */
+    if (!updated.length) {
+      await dbInsert(
+        "site_settings",
+        {
+          id: "site",
+          ...payload,
+        },
+      );
+    }
+  } else {
+    await dbInsert(
+      "site_settings",
+      {
+        id: "site",
+        ...payload,
+      },
+    );
+  }
+
+  await writeAudit(
+    "SITE_SETTINGS_UPDATED",
+    "site",
+    "site",
+    {
+      contactMode,
+      contactRequireVerification,
+      contactNotifyByEmail,
+    },
+  );
+
+  revalidatePath(
+    "/",
+  );
+
+  revalidatePath(
+    "/admin/settings",
+  );
+
+  /*
+   * Force the page to reload
+   * from the newly saved DB data.
+   */
+  redirect(
+    "/admin/settings?saved=1",
+  );
 }
 
 export async function uploadMediaAction(form: FormData) {
