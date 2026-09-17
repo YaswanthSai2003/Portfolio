@@ -34,7 +34,7 @@ export default async function AdminResumePage() {
                 <div className="flex flex-wrap items-center gap-3"><h2 className="text-[13px] font-semibold">{item.label}</h2>{item.is_active ? <span className="rounded-full border border-emerald-400/30 px-2 py-1 font-[var(--font-mono)] text-[7px] uppercase tracking-[0.08em] text-emerald-300/75">Active</span> : null}</div>
                 <p className="mt-1 text-[9px] text-white/34">{item.file_name} · {(item.file_size / 1024).toFixed(0)} KB · {new Date(item.uploaded_at).toLocaleDateString()}</p>
               </div>
-              {!item.is_active ? <form action={activateResumeAction}><input type="hidden" name="id" value={item.id} /><button type="submit" className="text-[10px] font-semibold text-white/55 hover:text-white">Set active</button></form> : <a href="/api/resume/current" target="_blank" rel="noreferrer" className="text-[10px] font-semibold text-white/55 hover:text-white">Preview ↗</a>}
+              {!item.is_active ? <form action={activateResumeAction}><input type="hidden" name="id" value={item.id} /><button type="submit" className="text-[10px] font-semibold text-white/55 hover:text-white">Set active</button></form> : <a href="/resume" target="_blank" rel="noreferrer" className="text-[10px] font-semibold text-white/55 hover:text-white">Preview ↗</a>}
             </article>
           )) : <div className="py-12 text-[11px] text-white/35">No resume versions yet.</div>}
         </div>

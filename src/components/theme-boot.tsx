@@ -1,47 +1,63 @@
-import Script from "next/script";
+"use client";
+
+import { useRef } from "react";
+import { useServerInsertedHTML } from "next/navigation";
 
 type ThemeBootProps = {
   nonce?: string;
 };
 
+const themeBootCode = `
+(() => {
+  try {
+    const saved =
+      localStorage.getItem("portfolio-theme");
+
+    const prefersDark =
+      window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+
+    const theme =
+      saved === "dark" || saved === "light"
+        ? saved
+        : prefersDark
+          ? "dark"
+          : "light";
+
+    document.documentElement.dataset.theme =
+      theme;
+
+    document.documentElement.style.colorScheme =
+      theme;
+  } catch (_) {}
+})();
+`;
+
 export function ThemeBoot({
   nonce,
 }: ThemeBootProps) {
-  const code = `
-    (() => {
-      try {
-        const saved =
-          localStorage.getItem("portfolio-theme");
+  const inserted =
+    useRef(false);
 
-        const prefersDark =
-          window.matchMedia(
-            "(prefers-color-scheme: dark)"
-          ).matches;
+  useServerInsertedHTML(() => {
+    if (inserted.current) {
+      return null;
+    }
 
-        const theme =
-          saved === "dark" || saved === "light"
-            ? saved
-            : prefersDark
-              ? "dark"
-              : "light";
+    inserted.current =
+      true;
 
-        document.documentElement.dataset.theme =
-          theme;
+    return (
+      <script
+        nonce={nonce}
+        dangerouslySetInnerHTML={{
+          __html:
+            themeBootCode,
+        }}
+      />
+    );
+  });
 
-        document.documentElement.style.colorScheme =
-          theme;
-      } catch (_) {}
-    })();
-  `;
-
-  return (
-    <Script
-      id="theme-boot"
-      nonce={nonce}
-      strategy="beforeInteractive"
-      dangerouslySetInnerHTML={{
-        __html: code,
-      }}
-    />
-  );
+  return null;
 }

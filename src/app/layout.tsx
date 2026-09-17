@@ -78,9 +78,7 @@ export default async function RootLayout({
         ${mono.variable}
       `}
     >
-      <head>
-        <ThemeBoot nonce={nonce} />
-      </head>
+      <head />
 
       <body
         className="
@@ -100,6 +98,10 @@ export default async function RootLayout({
           dark:text-[#f4f4f2]
         "
       >
+        <ThemeBoot
+          nonce={nonce}
+        />
+
         {children}
       </body>
     </html>

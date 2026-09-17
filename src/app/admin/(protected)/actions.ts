@@ -576,14 +576,6 @@ export async function saveSettingsAction(
     ),
   };
 
-  // Remove the old manual resume fallback if it exists from an earlier build.
-  // Resume availability now comes only from resume_versions.is_active.
-  delete (
-    data as Record<
-      string,
-      unknown
-    >
-  ).resumeUrl;
 
   const payload = {
     data,
