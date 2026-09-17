@@ -33,6 +33,7 @@ export type Project = {
   coverImage?: string;
   gallery?: ProjectGalleryItem[];
   githubUrl?: string;
+  repositoryVisibility?: "public" | "private" | "none";
   liveUrl?: string;
   featured: boolean;
   status?: "draft" | "published" | "archived";
@@ -44,8 +45,9 @@ export type Project = {
   caseStudy: ProjectCaseStudy;
 };
 
-const averlenLiveUrl = process.env.NEXT_PUBLIC_AVERLEN_LIVE_URL || "https://averlen.app";
-
+// Fallback project content only.
+// Runtime GitHub/live URLs and repository access are managed through Supabase
+// and mapped onto Project by src/lib/content.ts.
 export const projects: Project[] = [
   {
     slug: "averlen",
@@ -84,10 +86,6 @@ export const projects: Project[] = [
         alt: "Averlen analytics dashboard",
       },
     ],
-    githubUrl:
-      process.env.NEXT_PUBLIC_AVERLEN_GITHUB_URL ||
-      "https://github.com/YaswanthSai2003/Averlen",
-    liveUrl: averlenLiveUrl || undefined,
     featured: true,
     status: "published",
     sortOrder: 1,
@@ -131,8 +129,6 @@ export const projects: Project[] = [
     stack: ["Python", "FastAPI", "Claude", "GitHub", "Pytest"],
     visual: "architecture",
     visualLabel: "Review workflow",
-    githubUrl: process.env.NEXT_PUBLIC_PR_REVIEW_GITHUB_URL || undefined,
-    liveUrl: process.env.NEXT_PUBLIC_PR_REVIEW_LIVE_URL || undefined,
     featured: false,
     status: "archived",
     sortOrder: 99,
@@ -185,8 +181,6 @@ export const projects: Project[] = [
     stack: ["PyTorch", "Faster R-CNN", "TorchMetrics", "Python"],
     visual: "architecture",
     visualLabel: "ML pipeline",
-    githubUrl:
-      process.env.NEXT_PUBLIC_OBJECT_DETECTION_GITHUB_URL ||"",
     featured: false,
     status: "published",
     sortOrder: 4,
@@ -229,9 +223,6 @@ export const projects: Project[] = [
     stack: ["Node.js", "Express", "PostgreSQL", "Redis", "JWT"],
     visual: "architecture",
     visualLabel: "Backend architecture",
-    githubUrl:
-      process.env.NEXT_PUBLIC_READING_PLATFORM_GITHUB_URL ||
-      "https://github.com/YaswanthSai2003/BookApi",
     featured: true,
     status: "published",
     sortOrder: 2,
@@ -277,8 +268,6 @@ export const projects: Project[] = [
     featured: true,
     status: "published",
     sortOrder: 3,
-    githubUrl: "https://github.com/YaswanthSai2003/Mini-compliance-tracker",
-    liveUrl: "https://mini-compliance-tracker-1ka1.vercel.app/",
     caseStudy: {
       overview:
         "A compact full-stack compliance tracker built around client work, task status, deadlines and responsive day-to-day usage.",
@@ -304,8 +293,6 @@ export const projects: Project[] = [
     featured: false,
     status: "published",
     sortOrder: 6,
-    githubUrl: process.env.NEXT_PUBLIC_FINANCE_DASHBOARD_GITHUB_URL || undefined,
-    liveUrl: process.env.NEXT_PUBLIC_FINANCE_DASHBOARD_LIVE_URL || "https://finance-dashboard-five-beige.vercel.app/",
     caseStudy: {
       overview:
         "A frontend-focused finance dashboard designed around hierarchy, responsive layout and clear data visualisation.",
@@ -331,8 +318,6 @@ export const projects: Project[] = [
     featured: false,
     status: "published",
     sortOrder: 7,
-    githubUrl: process.env.NEXT_PUBLIC_SMART_BOOKMARKS_GITHUB_URL || undefined,
-    liveUrl: process.env.NEXT_PUBLIC_SMART_BOOKMARKS_LIVE_URL || undefined,
     caseStudy: {
       overview:
         "A focused full-stack app for saving private bookmarks and keeping them synchronised across sessions.",

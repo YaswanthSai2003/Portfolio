@@ -13,6 +13,102 @@ function getProject(projects: Project[], slug: string) {
   return projects.find((project) => project.slug === slug);
 }
 
+function getRepositoryVisibility(
+  project: Project,
+) {
+  return (
+    project.repositoryVisibility ||
+    (
+      project.githubUrl
+        ? "public"
+        : "none"
+    )
+  );
+}
+
+function RepositoryAction({
+  project,
+}: {
+  project: Project;
+}) {
+  const visibility =
+    getRepositoryVisibility(
+      project,
+    );
+
+  if (
+    visibility ===
+    "private"
+  ) {
+    return (
+      <span
+        className="
+          inline-flex
+          items-center
+          gap-2
+          text-black/42
+          dark:text-white/42
+        "
+      >
+        <span
+          aria-hidden="true"
+          className="
+            size-1.5
+            rounded-full
+            bg-black/30
+            dark:bg-white/30
+          "
+        />
+
+        Private repository
+      </span>
+    );
+  }
+
+  if (
+    visibility !==
+      "public" ||
+    !project.githubUrl
+  ) {
+    return null;
+  }
+
+  return (
+    <TrackedLink
+      href={
+        project.githubUrl
+      }
+      eventType="github_click"
+      projectSlug={
+        project.slug
+      }
+      className="
+        group
+        inline-flex
+        items-center
+        gap-2
+        text-black/48
+        transition
+        hover:text-black
+        dark:text-white/48
+        dark:hover:text-white
+      "
+    >
+      GitHub
+
+      <span
+        className="
+          transition-transform
+          group-hover:-translate-y-0.5
+          group-hover:translate-x-0.5
+        "
+      >
+        ↗
+      </span>
+    </TrackedLink>
+  );
+}
+
 function FeatureActions({ project }: { project: Project }) {
   return (
     <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[11px] font-semibold">
@@ -37,19 +133,9 @@ function FeatureActions({ project }: { project: Project }) {
         </TrackedLink>
       ) : null}
 
-      {project.githubUrl ? (
-        <TrackedLink
-          href={project.githubUrl}
-          eventType="github_click"
-          projectSlug={project.slug}
-          className="group inline-flex items-center gap-2 text-black/48 transition hover:text-black dark:text-white/48 dark:hover:text-white"
-        >
-          GitHub
-          <span className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
-            ↗
-          </span>
-        </TrackedLink>
-      ) : null}
+      <RepositoryAction
+        project={project}
+      />
     </div>
   );
 }
@@ -64,19 +150,9 @@ function ProjectActions({ project }: { project: Project }) {
         Case study
       </Link>
 
-      {project.githubUrl ? (
-        <TrackedLink
-          href={project.githubUrl}
-          eventType="github_click"
-          projectSlug={project.slug}
-          className="group inline-flex items-center gap-2 text-black/48 transition hover:text-black dark:text-white/48 dark:hover:text-white"
-        >
-          GitHub
-          <span className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
-            ↗
-          </span>
-        </TrackedLink>
-      ) : null}
+      <RepositoryAction
+        project={project}
+      />
 
       {project.liveUrl ? (
         <TrackedLink

@@ -10,7 +10,6 @@ export type SiteSettings = {
   githubUrl: string;
   linkedinUrl: string;
   email: string;
-  resumeUrl: string;
   contactMode: ContactMode;
   contactRequireVerification: boolean;
   contactNotifyByEmail: boolean;
@@ -32,6 +31,14 @@ const brandName = (
   .trim()
   .toUpperCase();
 
+/**
+ * Code-level defaults only.
+ *
+ * When Supabase is configured, getSiteSettings() overlays the values stored in
+ * site_settings.data on top of these defaults. That means the Admin portal is
+ * the source of truth in production while this object remains a safe fallback
+ * for first boot / local development.
+ */
 export const siteConfig: SiteSettings = {
   fullName,
   brandName,
@@ -40,15 +47,11 @@ export const siteConfig: SiteSettings = {
   heroIntro:
     "Full-stack products, backend systems, AI-assisted developer tooling and applied machine learning — built with product judgement and production-minded engineering.",
   availability: "Open to software engineering opportunities",
-  githubUrl:
-    process.env.NEXT_PUBLIC_GITHUB_URL ||
-    "https://github.com/YaswanthSai2003",
-  linkedinUrl:
-    process.env.NEXT_PUBLIC_LINKEDIN_URL || "",
-  email:
-    process.env.NEXT_PUBLIC_CONTACT_EMAIL || "",
-  resumeUrl:
-    process.env.NEXT_PUBLIC_RESUME_URL || "",
+
+  githubUrl: "",
+  linkedinUrl: "",
+  email: "",
+
   contactMode: "form",
   contactRequireVerification: true,
   contactNotifyByEmail: false,

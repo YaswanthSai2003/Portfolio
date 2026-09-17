@@ -1,6 +1,20 @@
-import { projects as fallbackProjects, type Project } from "@/data/projects";
-import { siteConfig, type SiteSettings } from "@/data/site";
-import { dbSelect, hasSupabase } from "./supabase-rest";
+import {
+  projects as fallbackProjects,
+  type Project,
+} from "@/data/projects";
+import {
+  siteConfig,
+  type SiteSettings,
+} from "@/data/site";
+import {
+  dbSelect,
+  hasSupabase,
+} from "./supabase-rest";
+
+type RepositoryVisibility =
+  | "public"
+  | "private"
+  | "none";
 
 type DbProject = {
   id: string;
@@ -17,6 +31,7 @@ type DbProject = {
   cover_image: string | null;
   gallery: Project["gallery"] | null;
   github_url: string | null;
+  repository_visibility: RepositoryVisibility | null;
   live_url: string | null;
   featured: boolean;
   status: "draft" | "published" | "archived";
@@ -26,25 +41,38 @@ type DbProject = {
 };
 
 function fallbackProject(slug: string) {
-  return fallbackProjects.find((project) => project.slug === slug);
-}
-
-function liveUrlFallback(slug: string) {
-  return fallbackProject(slug)?.liveUrl?.trim() || undefined;
-}
-
-function githubUrlFallback(slug: string) {
-  return fallbackProject(slug)?.githubUrl?.trim() || undefined;
+  return fallbackProjects.find(
+    (project) => project.slug === slug,
+  );
 }
 
 function mapProject(row: DbProject): Project {
   const fallback = fallbackProject(row.slug);
-  const rawDbGallery = row.gallery?.length ? row.gallery : undefined;
-  const staleAverlenMedia = row.slug === "averlen" && (
-    row.cover_image?.trim() === "/projects/averlen-analytics.png" ||
-    rawDbGallery?.every((item) => item.image === "/projects/averlen-analytics.png")
-  );
-  const dbGallery = staleAverlenMedia ? undefined : rawDbGallery;
+  const rawDbGallery = row.gallery?.length
+    ? row.gallery
+    : undefined;
+
+  const staleAverlenMedia =
+    row.slug === "averlen" &&
+    (row.cover_image?.trim() ===
+      "/projects/averlen-analytics.png" ||
+      rawDbGallery?.every(
+        (item) =>
+          item.image ===
+          "/projects/averlen-analytics.png",
+      ));
+
+  const dbGallery = staleAverlenMedia
+    ? undefined
+    : rawDbGallery;
+
+  const githubUrl =
+    row.github_url?.trim() || undefined;
+
+  const repositoryVisibility: RepositoryVisibility =
+    row.repository_visibility ||
+    (githubUrl ? "public" : "none");
+
   return {
     id: row.id,
     slug: row.slug,
@@ -57,16 +85,26 @@ function mapProject(row: DbProject): Project {
     stack: row.stack || [],
     visual: row.visual,
     visualLabel: row.visual_label || undefined,
-    // Preserve admin media when present, but do not let an older NULL database row
-    // erase media that exists in the checked-in project definition.
+
+    // Keep checked-in project imagery as a media fallback for older DB rows.
+    // Links intentionally do NOT use the fallback project configuration below.
     coverImage: staleAverlenMedia
-      ? (fallback?.coverImage || fallback?.gallery?.[0]?.image)
-      : (row.cover_image?.trim() || dbGallery?.[0]?.image || fallback?.coverImage || fallback?.gallery?.[0]?.image),
-    gallery: dbGallery || fallback?.gallery || undefined,
-    // Database values win, but seeded/older rows may still have NULL URLs.
-    // Fall back to the public project configuration so known links remain visible.
-    githubUrl: row.github_url?.trim() || githubUrlFallback(row.slug),
-    liveUrl: row.live_url?.trim() || liveUrlFallback(row.slug),
+      ? fallback?.coverImage ||
+        fallback?.gallery?.[0]?.image
+      : row.cover_image?.trim() ||
+        dbGallery?.[0]?.image ||
+        fallback?.coverImage ||
+        fallback?.gallery?.[0]?.image,
+
+    gallery:
+      dbGallery || fallback?.gallery || undefined,
+
+    // Admin / DB values are authoritative for public links.
+    // Clearing a URL in Admin therefore keeps it cleared.
+    githubUrl,
+    repositoryVisibility,
+    liveUrl: row.live_url?.trim() || undefined,
+
     featured: row.featured,
     status: row.status,
     sortOrder: row.sort_order,
@@ -75,55 +113,136 @@ function mapProject(row: DbProject): Project {
   };
 }
 
-const hiddenPublicProjectSlugs = new Set(["pr-review-agent"]);
+const hiddenPublicProjectSlugs = new Set([
+  "pr-review-agent",
+]);
 
-export async function getPublishedProjects(): Promise<Project[]> {
+export async function getPublishedProjects(): Promise<
+  Project[]
+> {
   if (!hasSupabase()) {
     return [...fallbackProjects]
-      .filter((project) => project.status === "published" && !hiddenPublicProjectSlugs.has(project.slug))
-      .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
+      .filter(
+        (project) =>
+          project.status === "published" &&
+          !hiddenPublicProjectSlugs.has(
+            project.slug,
+          ),
+      )
+      .sort(
+        (a, b) =>
+          (a.sortOrder ?? 999) -
+          (b.sortOrder ?? 999),
+      );
   }
+
   try {
     const rows = await dbSelect<DbProject>(
       "projects",
       "select=*&status=eq.published&order=sort_order.asc",
     );
-    const mapped = rows.length ? rows.map(mapProject) : fallbackProjects;
-    return mapped.filter((project) => !hiddenPublicProjectSlugs.has(project.slug));
+
+    const mapped = rows.length
+      ? rows.map(mapProject)
+      : fallbackProjects;
+
+    return mapped.filter(
+      (project) =>
+        !hiddenPublicProjectSlugs.has(
+          project.slug,
+        ),
+    );
   } catch {
     return fallbackProjects
-      .filter((project) => project.status === "published" && !hiddenPublicProjectSlugs.has(project.slug))
-      .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
+      .filter(
+        (project) =>
+          project.status === "published" &&
+          !hiddenPublicProjectSlugs.has(
+            project.slug,
+          ),
+      )
+      .sort(
+        (a, b) =>
+          (a.sortOrder ?? 999) -
+          (b.sortOrder ?? 999),
+      );
   }
 }
 
-export async function getProjectBySlug(slug: string): Promise<Project | undefined> {
-  if (hiddenPublicProjectSlugs.has(slug)) return undefined;
-  if (!hasSupabase()) return fallbackProjects.find((project) => project.slug === slug && project.status === "published");
+export async function getProjectBySlug(
+  slug: string,
+): Promise<Project | undefined> {
+  if (hiddenPublicProjectSlugs.has(slug)) {
+    return undefined;
+  }
+
+  if (!hasSupabase()) {
+    return fallbackProjects.find(
+      (project) =>
+        project.slug === slug &&
+        project.status === "published",
+    );
+  }
+
   try {
     const rows = await dbSelect<DbProject>(
       "projects",
-      `select=*&slug=eq.${encodeURIComponent(slug)}&status=eq.published&limit=1`,
+      `select=*&slug=eq.${encodeURIComponent(
+        slug,
+      )}&status=eq.published&limit=1`,
     );
-    return rows[0] ? mapProject(rows[0]) : fallbackProjects.find((project) => project.slug === slug && project.status === "published");
+
+    return rows[0]
+      ? mapProject(rows[0])
+      : fallbackProjects.find(
+          (project) =>
+            project.slug === slug &&
+            project.status === "published",
+        );
   } catch {
-    return fallbackProjects.find((project) => project.slug === slug && project.status === "published");
+    return fallbackProjects.find(
+      (project) =>
+        project.slug === slug &&
+        project.status === "published",
+    );
   }
 }
 
-export async function getAllProjectsForAdmin(): Promise<Project[]> {
-  if (!hasSupabase()) return fallbackProjects;
-  const rows = await dbSelect<DbProject>("projects", "select=*&order=sort_order.asc");
+export async function getAllProjectsForAdmin(): Promise<
+  Project[]
+> {
+  if (!hasSupabase()) {
+    return fallbackProjects;
+  }
+
+  const rows = await dbSelect<DbProject>(
+    "projects",
+    "select=*&order=sort_order.asc",
+  );
+
   return rows.map(mapProject);
 }
 
-type SettingsRow = { id: string; data: Partial<SiteSettings> };
+type SettingsRow = {
+  id: string;
+  data: Partial<SiteSettings>;
+};
 
 export async function getSiteSettings(): Promise<SiteSettings> {
-  if (!hasSupabase()) return siteConfig;
+  if (!hasSupabase()) {
+    return siteConfig;
+  }
+
   try {
-    const rows = await dbSelect<SettingsRow>("site_settings", "select=*&id=eq.site&limit=1");
-    return { ...siteConfig, ...(rows[0]?.data || {}) };
+    const rows = await dbSelect<SettingsRow>(
+      "site_settings",
+      "select=id,data&id=eq.site&limit=1",
+    );
+
+    return {
+      ...siteConfig,
+      ...(rows[0]?.data || {}),
+    };
   } catch {
     return siteConfig;
   }
