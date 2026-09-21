@@ -27,34 +27,44 @@ const mono = JetBrains_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings =
-    await getSiteSettings();
+  const settings = await getSiteSettings();
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "http://localhost:3000";
 
   return {
-    metadataBase: new URL(
-      process.env.NEXT_PUBLIC_SITE_URL ||
-        "http://localhost:3000",
-    ),
+    metadataBase: new URL(siteUrl),
 
     title: {
-      default:
-        `${settings.fullName} — ${settings.role}`,
-
-      template:
-        `%s — ${settings.fullName}`,
+      default: `${settings.fullName} — ${settings.role}`,
+      template: `%s — ${settings.fullName}`,
     },
 
-    description:
-      settings.heroIntro,
+    description: settings.heroIntro,
 
     openGraph: {
-      title:
-        `${settings.fullName} — ${settings.role}`,
-
-      description:
-        settings.heroIntro,
-
+      title: `${settings.fullName} — ${settings.role}`,
+      description: settings.heroIntro,
+      url: siteUrl,
+      siteName: `${settings.fullName} Portfolio`,
       type: "website",
+
+      images: [
+        {
+          url: "/portfolio-preview.png",
+          width: 1200,
+          height: 630,
+          alt: `${settings.fullName} Portfolio`,
+        },
+      ],
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: `${settings.fullName} — ${settings.role}`,
+      description: settings.heroIntro,
+      images: ["/portfolio-preview.png"],
     },
   };
 }
@@ -84,23 +94,17 @@ export default async function RootLayout({
         className="
           m-0
           min-h-screen
-
           bg-[#eef0f1]
           text-[#141416]
-
           font-[var(--font-body)]
           antialiased
-
           transition-colors
           duration-300
-
           dark:bg-[#12151a]
           dark:text-[#f4f4f2]
         "
       >
-        <ThemeBoot
-          nonce={nonce}
-        />
+        <ThemeBoot nonce={nonce} />
 
         {children}
       </body>
