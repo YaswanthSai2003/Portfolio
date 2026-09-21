@@ -31,7 +31,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ||
-    "http://localhost:3000";
+    "https://yaswanthkadhati.in";
+
+  const previewImage = new URL(
+    "/portfolio-preview.png",
+    siteUrl,
+  ).toString();
 
   return {
     metadataBase: new URL(siteUrl),
@@ -43,16 +48,22 @@ export async function generateMetadata(): Promise<Metadata> {
 
     description: settings.heroIntro,
 
+    alternates: {
+      canonical: siteUrl,
+    },
+
     openGraph: {
       title: `${settings.fullName} — ${settings.role}`,
       description: settings.heroIntro,
+
       url: siteUrl,
       siteName: `${settings.fullName} Portfolio`,
+
       type: "website",
 
       images: [
         {
-          url: "/portfolio-preview.png",
+          url: previewImage,
           width: 1200,
           height: 630,
           alt: `${settings.fullName} Portfolio`,
@@ -62,9 +73,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
     twitter: {
       card: "summary_large_image",
+
       title: `${settings.fullName} — ${settings.role}`,
+
       description: settings.heroIntro,
-      images: ["/portfolio-preview.png"],
+
+      images: [previewImage],
+    },
+
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }
@@ -88,8 +107,6 @@ export default async function RootLayout({
         ${mono.variable}
       `}
     >
-      <head />
-
       <body
         className="
           m-0
